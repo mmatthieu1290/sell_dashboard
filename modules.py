@@ -89,7 +89,7 @@ def graph_years(responses,df):
       for year,sale in zip(years,sales):
       
          ax.scatter(year,sale,c="blue")
-      downloadExcel(df_year.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_A.xlsx")
+      downloadExcel(df_year.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_año.xlsx")
 
 
    elif por_tipo_de_productos == False:
@@ -107,7 +107,7 @@ def graph_years(responses,df):
             df_store_year['tienda'] = store
             df_toexcel = pd.concat([df_toexcel,df_store_year])
       df_toexcel = df_toexcel[['tienda','year','sales']]
-      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_anio_AyT.xlsx")         
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_año_tienda.xlsx")         
 
    elif por_tiendas == False:
       df_toexcel = pd.DataFrame(columns = ['year','sales','producto'])
@@ -123,7 +123,7 @@ def graph_years(responses,df):
             df_producto["producto"] = producto
             df_toexcel = pd.concat([df_toexcel,df_producto])
       df_toexcel = df_toexcel[['producto','year','sales']]
-      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_anio_AyP.xlsx")       
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_año_producto.xlsx")       
    else:
       df_toexcel = pd.DataFrame(columns = ['year','sales','tienda','producto'])
       for tienda_producto in options_tiendas_productos:
@@ -142,7 +142,7 @@ def graph_years(responses,df):
             df_toexcel = pd.concat([df_toexcel,df_tienda_producto_year])
       df_toexcel = df_toexcel[["tienda",'producto','year','sales']]
       df_toexcel = df_toexcel.sort_values(["tienda","producto","year"])
-      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_anio_AyTyP.xlsx")       
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_año_tienda_producto.xlsx")       
 
    ax.legend()
    ax.grid(True) 
@@ -178,7 +178,9 @@ def graph_monthly(responses,df_years):
       
          ax.scatter(month,sale,c="blue")
 
+      downloadExcel(df_month.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes.xlsx")
    elif por_tipo_de_productos == False:
+      df_toexcel = pd.DataFrame(columns = ['month','sales','tienda'])
       for store in options_tiendas:
             nb_store = int(store.split(" ")[1])  
             df_store = df_years[df_years.store_nbr == nb_store]
@@ -189,9 +191,14 @@ def graph_monthly(responses,df_years):
             ax.plot(months,sales,label = str(store))
             for month,sale in zip(months,sales):
                ax.scatter(month,sale,c="blue")
-            ax.set_xticks(ticks=months)   
+            ax.set_xticks(ticks=months)
+            df_store_month["tienda"] = tienda
+            df_toexcel = pd.concat([df_toexcel,df_store_month])
+      df_toexcel = df_toexcel[['tienda','month','sales']]
+      downloadExcel(df_month.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_tienda.xlsx")         
 
    elif por_tiendas == False:
+      df_toexcel = pd.DataFrame(columns = ['month','sales','producto'])
       for producto in options_productos:
             df_producto = df_years[df_years.family == producto]
             df_producto_year_month = df_producto.groupby(["year","month"])["sales"].sum().to_frame().reset_index().sort_values("month")
@@ -201,8 +208,13 @@ def graph_monthly(responses,df_years):
             ax.plot(months,sales,label = producto)
             for month,sale in zip(months,sales):
                ax.scatter(month,sale,c="blue")
-            ax.set_xticks(ticks=months)   
+            ax.set_xticks(ticks=months)
+            df_producto_month["producto"] = producto
+            df_toexcel = pd.concat([df_toexcel,df_producto_month])
+      df_toexcel = df_toexcel[['producto','month','sales']]
+      downloadExcel(df_month.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_producto.xlsx")                    
    else:
+      df_toexcel = pd.DataFrame(columns = ['month','sales','tienda','producto'])
       for tienda_producto in options_tiendas_productos:
             tienda,producto = tienda_producto
             nb_tienda = int(tienda.split(" ")[1])
@@ -214,7 +226,12 @@ def graph_monthly(responses,df_years):
             ax.plot(months,sales,label = tienda_producto)
             for month,sale in zip(months,sales):
                ax.scatter(month,sale,c="blue")
-            ax.set_xticks(ticks=months)   
+            ax.set_xticks(ticks=months)
+            df_tienda_producto_month["tienda"] = tienda
+            df_tienda_producto_month["producto"] = producto
+            df_toexcel = pd.concat([df_toexcel,df_tienda_producto_month])
+      df_toexcel = df_toexcel[['tienda','producto','month','sales']]
+      downloadExcel(df_month.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_tienda_producto.xlsx")         
    ax.legend()
    ax.grid()
    st.pyplot(fig)               
