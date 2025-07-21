@@ -149,7 +149,8 @@ def graph_years(responses,df):
    st.pyplot(fig)
 
 def graph_monthly(responses,df_years):
-
+   dict_month = {1:"Enero",2:"Febrero",3:"Marzo",4:"Abril",5:"Mayo",6:"Junio",7:"Julio",8:"Agosto",9:"Septiembre",
+                 10:"Octubre",11:"Noviembre",12:"Diciembre"}
    por_tiendas = False
    por_tipo_de_productos = False
    fig, ax = plt.subplots() 
@@ -178,6 +179,7 @@ def graph_monthly(responses,df_years):
       
          ax.scatter(month,sale,c="blue")
 
+      df_month["month"] = df_month["month"].replace(dict_month)
       downloadExcel(df_month.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes.xlsx")
    elif por_tipo_de_productos == False:
       df_toexcel = pd.DataFrame(columns = ['month','sales','tienda'])
@@ -195,6 +197,7 @@ def graph_monthly(responses,df_years):
             df_store_month["tienda"] = tienda
             df_toexcel = pd.concat([df_toexcel,df_store_month])
       df_toexcel = df_toexcel[['tienda','month','sales']]
+      df_toexcel["month"] = df_toexcel["month"].replace(dict_month)
       downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_tienda.xlsx")         
 
    elif por_tiendas == False:
@@ -212,6 +215,7 @@ def graph_monthly(responses,df_years):
             df_producto_month["producto"] = producto
             df_toexcel = pd.concat([df_toexcel,df_producto_month])
       df_toexcel = df_toexcel[['producto','month','sales']]
+      df_toexcel["month"] = df_toexcel["month"].replace(dict_month)
       downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_producto.xlsx")                    
    else:
       df_toexcel = pd.DataFrame(columns = ['month','sales','tienda','producto'])
@@ -231,6 +235,7 @@ def graph_monthly(responses,df_years):
             df_tienda_producto_month["producto"] = producto
             df_toexcel = pd.concat([df_toexcel,df_tienda_producto_month])
       df_toexcel = df_toexcel[['tienda','producto','month','sales']]
+      df_toexcel["month"] = df_toexcel["month"].replace(dict_month)
       downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_tienda_producto.xlsx")         
    ax.legend()
    ax.grid()
