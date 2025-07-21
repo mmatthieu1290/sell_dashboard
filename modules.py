@@ -1,6 +1,7 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
+from toExcel import downloadExcel
 
 def first_page():
     
@@ -88,8 +89,11 @@ def graph_years(responses,df):
       for year,sale in zip(years,sales):
       
          ax.scatter(year,sale,c="blue")
+      downloadExcel(df_year.rename(columns = {"sales":"ventas","year":"año"}))
+
 
    elif por_tipo_de_productos == False:
+      df_toexcel = pd.DataFrame(columns = ['year','sales','tienda'])
       for store in options_tiendas:
             nb_store = int(store.split(" ")[1])  
             df_store = df[df.store_nbr == nb_store]
@@ -99,7 +103,11 @@ def graph_years(responses,df):
             ax.plot(years,sales,label = str(store))
             for year,sale in zip(years,sales):
                ax.scatter(year,sale,c="blue")
-            ax.set_xticks(ticks=years)   
+            ax.set_xticks(ticks=years)
+            df_store_year['tienda'] = store
+            df_toexcel = pd.concat([df_toexcel,df_store_year])
+      df_toexcel = df_toexcel[['tienda','year','sales']]
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}))         
 
    elif por_tiendas == False:
       for producto in options_productos:
