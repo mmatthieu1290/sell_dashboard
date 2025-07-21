@@ -141,6 +141,7 @@ def graph_years(responses,df):
             df_tienda_producto_year["producto"] = producto
             df_toexcel = pd.concat([df_toexcel,df_tienda_producto_year])
       df_toexcel = df_toexcel[["tienda",'producto','year','sales']]
+      df_toexcel = df_toexcel.sort_values(["tienda","producto","year"])
       downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_anio_AyTyP.xlsx")       
 
    ax.legend()
