@@ -197,6 +197,7 @@ def graph_monthly(responses,df_years):
             df_store_month["tienda"] = store
             df_toexcel = pd.concat([df_toexcel,df_store_month])
       df_toexcel = df_toexcel[['tienda','month','sales']]
+      df_toexcel = df_toexcel.sort_values(['tienda','month'])
       df_toexcel["month"] = df_toexcel["month"].replace(dict_month)
       downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_tienda.xlsx")         
 
@@ -215,6 +216,7 @@ def graph_monthly(responses,df_years):
             df_producto_month["producto"] = producto
             df_toexcel = pd.concat([df_toexcel,df_producto_month])
       df_toexcel = df_toexcel[['producto','month','sales']]
+      df_toexcel = df_toexcel.sort_values(['producto','month'])
       df_toexcel["month"] = df_toexcel["month"].replace(dict_month)
       downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_producto.xlsx")                    
    else:
@@ -235,6 +237,7 @@ def graph_monthly(responses,df_years):
             df_tienda_producto_month["producto"] = producto
             df_toexcel = pd.concat([df_toexcel,df_tienda_producto_month])
       df_toexcel = df_toexcel[['tienda','producto','month','sales']]
+      df_toexcel = df_toexcel.sort_values(['tienda','producto','month'])
       df_toexcel["month"] = df_toexcel["month"].replace(dict_month)
       downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_tienda_producto.xlsx")         
    ax.legend()
