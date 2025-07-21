@@ -15,4 +15,4 @@ def downloadExcel(df,nombre_archivo):
       processed_data = output.getvalue()
       st.download_button(label='📥 Descargar los resultados',
                                 data=processed_data ,
-                                file_name= 'resultados.xlsx')
+                                file_name= nombre_archivo)
