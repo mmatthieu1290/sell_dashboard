@@ -125,6 +125,7 @@ def graph_years(responses,df):
       df_toexcel = df_toexcel[['producto','year','sales']]
       downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_anio_AyP.xlsx")       
    else:
+      df_toexcel = pd.DataFrame(columns = ['year','sales','tienda','producto'])
       for tienda_producto in options_tiendas_productos:
             tienda,producto = tienda_producto
             nb_tienda = int(tienda.split(" ")[1])
@@ -135,7 +136,13 @@ def graph_years(responses,df):
             ax.plot(years,sales,label = tienda_producto)
             for year,sale in zip(years,sales):
                ax.scatter(year,sale,c="blue")
-            ax.set_xticks(ticks=years)   
+            ax.set_xticks(ticks=years)
+            df_tienda_producto_year["tienda"] = tienda
+            df_tienda_producto_year["producto"] = producto
+            df_toexcel = pd.concat([df_toexcel,df_tienda_producto_year])
+      df_toexcel = df_toexcel[["tienda",'producto','year','sales']]
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_anio_AyTyP.xlsx")       
+
    ax.legend()
    ax.grid(True) 
    st.pyplot(fig)
