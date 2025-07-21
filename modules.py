@@ -195,7 +195,7 @@ def graph_monthly(responses,df_years):
             df_store_month["tienda"] = tienda
             df_toexcel = pd.concat([df_toexcel,df_store_month])
       df_toexcel = df_toexcel[['tienda','month','sales']]
-      downloadExcel(df_month.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_tienda.xlsx")         
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_tienda.xlsx")         
 
    elif por_tiendas == False:
       df_toexcel = pd.DataFrame(columns = ['month','sales','producto'])
@@ -212,7 +212,7 @@ def graph_monthly(responses,df_years):
             df_producto_month["producto"] = producto
             df_toexcel = pd.concat([df_toexcel,df_producto_month])
       df_toexcel = df_toexcel[['producto','month','sales']]
-      downloadExcel(df_month.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_producto.xlsx")                    
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_producto.xlsx")                    
    else:
       df_toexcel = pd.DataFrame(columns = ['month','sales','tienda','producto'])
       for tienda_producto in options_tiendas_productos:
@@ -231,7 +231,7 @@ def graph_monthly(responses,df_years):
             df_tienda_producto_month["producto"] = producto
             df_toexcel = pd.concat([df_toexcel,df_tienda_producto_month])
       df_toexcel = df_toexcel[['tienda','producto','month','sales']]
-      downloadExcel(df_month.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_tienda_producto.xlsx")         
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_tienda_producto.xlsx")         
    ax.legend()
    ax.grid()
    st.pyplot(fig)               
