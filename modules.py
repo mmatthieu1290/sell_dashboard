@@ -194,7 +194,7 @@ def graph_monthly(responses,df_years):
             for month,sale in zip(months,sales):
                ax.scatter(month,sale,c="blue")
             ax.set_xticks(ticks=months)
-            df_store_month["tienda"] = tienda
+            df_store_month["tienda"] = store
             df_toexcel = pd.concat([df_toexcel,df_store_month])
       df_toexcel = df_toexcel[['tienda','month','sales']]
       df_toexcel["month"] = df_toexcel["month"].replace(dict_month)
