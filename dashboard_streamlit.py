@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
-from modules import first_questions,graph_years,graph_monthly,graph_monthly_by_year,first_page
+from modules import first_questions,first_page
+from modules_anuales import graph_years
+from modules_mensuales import graph_monthly,graph_monthly_by_year
 from modules_diarias import graph_daily,graph_daily_by_year,graph_daily_by_month,graph_daily_by_month_and_year
 
 st.title("Dashboard de Ventas")
