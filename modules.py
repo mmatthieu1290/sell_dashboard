@@ -89,7 +89,7 @@ def graph_years(responses,df):
       for year,sale in zip(years,sales):
       
          ax.scatter(year,sale,c="blue")
-      downloadExcel(df_year.rename(columns = {"sales":"ventas","year":"año"}))
+      downloadExcel(df_year.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_anio.xlsx")
 
 
    elif por_tipo_de_productos == False:
@@ -107,7 +107,7 @@ def graph_years(responses,df):
             df_store_year['tienda'] = store
             df_toexcel = pd.concat([df_toexcel,df_store_year])
       df_toexcel = df_toexcel[['tienda','year','sales']]
-      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}))         
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_anio_tienda.xlsx")         
 
    elif por_tiendas == False:
       for producto in options_productos:
