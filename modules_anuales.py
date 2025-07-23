@@ -6,17 +6,18 @@ from toExcel import downloadExcel
 
 def graph_years(responses,df):
    
-
+   years = df.year.tolist()
+   years = [str(year) for year in years]
    por_tiendas = False
    por_tipo_de_productos = False
-   fig, ax = plt.subplots() 
-   ax.set_xlabel('Year', fontweight ='bold', fontsize = 15)
-   ax.set_ylabel('Total sales', fontweight ='bold', fontsize = 15)   
+
    if "tiendas" in responses:
 
        por_tiendas = True
        options_tiendas = responses["tiendas"]
-       options_tiendas.sort()
+       numeros_tiendas = [int(store.split(" ")[1]) for store in options_tiendas]
+       numeros_tiendas.sort()
+       options_tiendas = ["Tienda" + " " + str(numero_tienda) for numero_tienda in numeros_tiendas]
    elif "productos" in responses:
        por_tipo_de_productos = True 
        options_productos = responses["productos"]
@@ -25,88 +26,64 @@ def graph_years(responses,df):
        por_tiendas = True            
        por_tipo_de_productos = True 
        options_tiendas_productos = responses["tiendas_productos"]
+       options_tiendas_productos_num = [(int(elt[0].split(" ")[1]),elt[1]) for elt in options_tiendas_productos]
+       options_tiendas_productos_num.sort()
+       options_tiendas_productos = [("Tienda " + str(elt[0]),elt[1]) for elt in options_tiendas_productos_num]
+
 
    if (por_tiendas == False) and (por_tipo_de_productos == False):
       df_year = df.groupby("year")["sales"].sum().to_frame().reset_index().sort_values("year")
-      years = df_year.year.tolist()
-      years = [str(year) for year in years]
       sales = df_year.sales.tolist()
-#      ax.plot(years,sales)
-#      ax.set_xticks(ticks=years)
-#      for year,sale in zip(years,sales):
-      
-#         ax.scatter(year,sale,c="blue")
       fig = go.Figure()
-      fig.add_trace(go.Scatter(x=years,y=sales,mode = "lines+markers"))
-      fig.update_xaxes(title_text = "año",title_font = {"size": 20},
-        title_standoff = 25,ticktext=years,tickvals=years,)
-      fig.update_yaxes(title_text = "ventas",title_font = {"size": 20},
-        title_standoff = 25)
-      st.plotly_chart(fig, config = {'scrollZoom': False})   
+      fig.add_trace(go.Scatter(x=years,y=sales,mode = "lines+markers",marker=dict(size=8)))
       downloadExcel(df_year.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_año.xlsx")
 
 
    elif por_tipo_de_productos == False:
       df_toexcel = pd.DataFrame(columns = ['year','sales','tienda'])
       fig = go.Figure()
-      years = df.sort_values("year")["year"].unique()
-      options_tiendas.sort()
       for store in options_tiendas:
             nb_store = int(store.split(" ")[1])  
             df_store = df[df.store_nbr == nb_store]
             df_store_year = df_store.groupby("year")["sales"].sum().to_frame().reset_index().sort_values("year")
 #            years = df_store_year.year.tolist()
             sales = df_store_year.sales.tolist()            
-            ax.plot(years,sales,label = str(store))
-            fig.add_trace(go.Scatter(x=years,y=sales,name=str(store)))
-            for year,sale in zip(years,sales):
-               ax.scatter(year,sale,c="blue")
-            ax.set_xticks(ticks=years)
+            fig.add_trace(go.Scatter(x=years,y=sales,name=str(store),mode = "lines+markers",marker=dict(size=8)))
             df_store_year['tienda'] = store
             df_toexcel = pd.concat([df_toexcel,df_store_year])
       df_toexcel = df_toexcel[['tienda','year','sales']].sort_values(["tienda","year"])
       downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_año_tienda.xlsx")
-      fig.update_xaxes(title_text = "año",title_font = {"size": 20},
-        title_standoff = 25,ticktext=years,tickvals=years)
-      fig.update_yaxes(title_text = "ventas",title_font = {"size": 20},
-        title_standoff = 25)         
-      st.plotly_chart(fig, config = {'scrollZoom': False})
    elif por_tiendas == False:
       df_toexcel = pd.DataFrame(columns = ['year','sales','producto'])
+      fig = go.Figure()
       for producto in options_productos:
             df_producto = df[df.family == producto]
             df_producto_year = df_producto.groupby("year")["sales"].sum().to_frame().reset_index().sort_values("year")
-            years = df_producto_year.year.tolist()
             sales = df_producto_year.sales.tolist()            
-            ax.plot(years,sales,label = producto)
-            for year,sale in zip(years,sales):
-               ax.scatter(year,sale,c="blue")
-            ax.set_xticks(ticks=years)
             df_producto["producto"] = producto
             df_toexcel = pd.concat([df_toexcel,df_producto])
+            fig.add_trace(go.Scatter(x=years,y=sales,name=str(producto),mode = "lines+markers",marker=dict(size=8)))
       df_toexcel = df_toexcel[['producto','year','sales']].sort_values(["producto","year"])
       downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_año_producto.xlsx")       
    else:
       df_toexcel = pd.DataFrame(columns = ['year','sales','tienda','producto'])
+      fig = go.Figure()
       for tienda_producto in options_tiendas_productos:
             tienda,producto = tienda_producto
             nb_tienda = int(tienda.split(" ")[1])
             df_tienda_producto = df[(df.family == producto)&(df.store_nbr == nb_tienda)]
             df_tienda_producto_year = df_tienda_producto.groupby("year")["sales"].sum().to_frame().reset_index().sort_values("year")
-            years = df_tienda_producto_year.year.tolist()
             sales = df_tienda_producto_year.sales.tolist()            
-            ax.plot(years,sales,label = tienda_producto)
-            for year,sale in zip(years,sales):
-               ax.scatter(year,sale,c="blue")
-            ax.set_xticks(ticks=years)
             df_tienda_producto_year["tienda"] = tienda
             df_tienda_producto_year["producto"] = producto
             df_toexcel = pd.concat([df_toexcel,df_tienda_producto_year])
+            fig.add_trace(go.Scatter(x=years,y=sales,name=tienda + " " +str(producto),mode = "lines+markers",marker=dict(size=8)))
       df_toexcel = df_toexcel[["tienda",'producto','year','sales']]
       df_toexcel = df_toexcel.sort_values(["tienda","producto","year"])
       downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_año_tienda_producto.xlsx")       
-
-   ax.legend()
-   ax.grid(True) 
-#   st.pyplot(fig)
+   fig.update_xaxes(title_text = "año",title_font = {"size": 20},
+        title_standoff = 25,ticktext=years,tickvals=years,)
+   fig.update_yaxes(title_text = "ventas",title_font = {"size": 20},
+        title_standoff = 25)
+   st.plotly_chart(fig, config = {'scrollZoom': False})   
 
