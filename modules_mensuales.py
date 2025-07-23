@@ -151,7 +151,10 @@ def graph_monthly_by_year(responses,df):
             ax.plot(months,sales,label = str(store)+ " " + str(year))
             for month,sale in zip(months,sales):
                ax.scatter(month,sale,c="blue")
-            ax.set_xticks(ticks=months)   
+            ax.set_xticks(ticks=months)
+            df_store_month["año"] = year
+            df_store_month["tienda"] = store
+            df_toexcel = pd.concat([df_toexcel,df_store_month])   
 
       elif por_tiendas == False:
          for producto in options_productos:
@@ -162,7 +165,10 @@ def graph_monthly_by_year(responses,df):
             ax.plot(months,sales,label = producto + " " + str(year))
             for month,sale in zip(months,sales):
                ax.scatter(month,sale,c="blue")
-            ax.set_xticks(ticks=months)   
+            ax.set_xticks(ticks=months)
+            df_producto_month["año"] = year
+            df_producto_month["producto"] = producto
+            df_toexcel = pd.concat([df_toexcel,df_producto_month])            
       else:
          for tienda_producto in options_tiendas_productos:
             tienda,producto = tienda_producto
@@ -175,11 +181,31 @@ def graph_monthly_by_year(responses,df):
             for month,sale in zip(months,sales):
                ax.scatter(month,sale,c="blue")
             ax.set_xticks(ticks=months)
+            df_tienda_producto_month["año"] = year
+            df_tienda_producto_month["tienda"] = tienda
+            df_tienda_producto_month["producto"] = producto
+            df_toexcel = pd.concat([df_toexcel,df_tienda_producto_month])         
    if (por_tiendas == False) and (por_tipo_de_productos == False):
       df_toexcel = df_toexcel[["año","month","sales"]].sort_values(["año","month"])
       df_toexcel["month"] = df_toexcel["month"].replace(dict_month)
       df_toexcel["año"] = df_toexcel["año"].astype(int)
-      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_año_producto.xlsx")               
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_mes_año_producto.xlsx")
+   elif por_tipo_de_productos == False:
+      df_toexcel = df_toexcel[["tienda","año","month","sales"]].sort_values(["tienda","año","month"])
+      df_toexcel["month"] = df_toexcel["month"].replace(dict_month)
+      df_toexcel["año"] = df_toexcel["año"].astype(int)
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_tienda_mes_año_producto.xlsx")      
+   elif por_tiendas == False:
+      df_toexcel = df_toexcel[["producto","año","month","sales"]].sort_values(["producto","año","month"])
+      df_toexcel["month"] = df_toexcel["month"].replace(dict_month)
+      df_toexcel["año"] = df_toexcel["año"].astype(int)
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_producto_mes_año_producto.xlsx")    
+   else:
+      df_toexcel = df_toexcel[["tienda","producto","año","month","sales"]].sort_values(["tienda","producto","año","month"])
+      df_toexcel["month"] = df_toexcel["month"].replace(dict_month)
+      df_toexcel["año"] = df_toexcel["año"].astype(int)
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","month":"mes"}),"resultados_por_tienda_producto_mes_año_producto.xlsx")    
+
    ax.legend()
    ax.grid()
    st.pyplot(fig)                  

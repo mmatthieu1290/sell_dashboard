@@ -1,6 +1,7 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
+import plotly.graph_objects as go
 from toExcel import downloadExcel
 
 def graph_years(responses,df):
@@ -15,9 +16,11 @@ def graph_years(responses,df):
 
        por_tiendas = True
        options_tiendas = responses["tiendas"]
+       options_tiendas.sort()
    elif "productos" in responses:
        por_tipo_de_productos = True 
        options_productos = responses["productos"]
+       options_productos.sort()
    elif "tiendas_productos" in responses:
        por_tiendas = True            
        por_tipo_de_productos = True 
@@ -26,32 +29,48 @@ def graph_years(responses,df):
    if (por_tiendas == False) and (por_tipo_de_productos == False):
       df_year = df.groupby("year")["sales"].sum().to_frame().reset_index().sort_values("year")
       years = df_year.year.tolist()
+      years = [str(year) for year in years]
       sales = df_year.sales.tolist()
-      ax.plot(years,sales)
-      ax.set_xticks(ticks=years)
-      for year,sale in zip(years,sales):
+#      ax.plot(years,sales)
+#      ax.set_xticks(ticks=years)
+#      for year,sale in zip(years,sales):
       
-         ax.scatter(year,sale,c="blue")
+#         ax.scatter(year,sale,c="blue")
+      fig = go.Figure()
+      fig.add_trace(go.Scatter(x=years,y=sales,mode = "lines+markers"))
+      fig.update_xaxes(title_text = "año",title_font = {"size": 20},
+        title_standoff = 25,ticktext=years,tickvals=years,)
+      fig.update_yaxes(title_text = "ventas",title_font = {"size": 20},
+        title_standoff = 25)
+      st.plotly_chart(fig, config = {'scrollZoom': False})   
       downloadExcel(df_year.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_año.xlsx")
 
 
    elif por_tipo_de_productos == False:
       df_toexcel = pd.DataFrame(columns = ['year','sales','tienda'])
+      fig = go.Figure()
+      years = df.sort_values("year")["year"].unique()
+      options_tiendas.sort()
       for store in options_tiendas:
             nb_store = int(store.split(" ")[1])  
             df_store = df[df.store_nbr == nb_store]
             df_store_year = df_store.groupby("year")["sales"].sum().to_frame().reset_index().sort_values("year")
-            years = df_store_year.year.tolist()
+#            years = df_store_year.year.tolist()
             sales = df_store_year.sales.tolist()            
             ax.plot(years,sales,label = str(store))
+            fig.add_trace(go.Scatter(x=years,y=sales,name=str(store)))
             for year,sale in zip(years,sales):
                ax.scatter(year,sale,c="blue")
             ax.set_xticks(ticks=years)
             df_store_year['tienda'] = store
             df_toexcel = pd.concat([df_toexcel,df_store_year])
       df_toexcel = df_toexcel[['tienda','year','sales']].sort_values(["tienda","year"])
-      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_año_tienda.xlsx")         
-
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_año_tienda.xlsx")
+      fig.update_xaxes(title_text = "año",title_font = {"size": 20},
+        title_standoff = 25,ticktext=years,tickvals=years)
+      fig.update_yaxes(title_text = "ventas",title_font = {"size": 20},
+        title_standoff = 25)         
+      st.plotly_chart(fig, config = {'scrollZoom': False})
    elif por_tiendas == False:
       df_toexcel = pd.DataFrame(columns = ['year','sales','producto'])
       for producto in options_productos:
@@ -89,5 +108,5 @@ def graph_years(responses,df):
 
    ax.legend()
    ax.grid(True) 
-   st.pyplot(fig)
+#   st.pyplot(fig)
 

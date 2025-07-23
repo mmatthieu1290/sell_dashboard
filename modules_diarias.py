@@ -1,8 +1,11 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+import pandas as pd
+from toExcel import downloadExcel
 
 def graph_daily(responses,df):
 
+   dict_dias = {1 : "Lunes", 2 : "Martes" , 3 : "Miercoles" , 4 : "Jueves" , 5 : "Viernes" , 6 : "Sabado" , 7 : "Domingo"}
    por_tiendas = False
    por_tipo_de_productos = False
    fig, ax = plt.subplots() 
@@ -30,8 +33,11 @@ def graph_daily(responses,df):
       for day,sale in zip(days,sales):
       
          ax.scatter(day,sale,c="blue")
+      df_day["day"] = df_day["day"].replace(dict_dias)
+      downloadExcel(df_day.rename(columns = {"sales":"ventas","day":"dia"}),"resultados_por_dia.xlsx")    
 
    elif por_tipo_de_productos == False:
+      df_toexcel = pd.DataFrame(columns = ['day','sales','tienda'])
       for store in options_tiendas:
             nb_store = int(store.split(" ")[1])  
             df_store = df[df.store_nbr == nb_store]
@@ -42,9 +48,17 @@ def graph_daily(responses,df):
             ax.plot(days,sales,label = str(store))
             for day,sale in zip(days,sales):
                ax.scatter(day,sale,c="blue")
-            ax.set_xticks(ticks=days)   
+            ax.set_xticks(ticks=days) 
+            df_store_day["tienda"] = store
+            df_toexcel = pd.concat([df_toexcel,df_store_day])
+      df_toexcel = df_toexcel[['tienda','day','sales']]
+      df_toexcel = df_toexcel.sort_values(['tienda','day'])
+      df_toexcel["day"] = df_toexcel["day"].replace(dict_dias)
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","day":"dia"}),"resultados_por_dia_tienda.xlsx")              
+
 
    elif por_tiendas == False:
+      df_toexcel = pd.DataFrame(columns = ['day','sales','producto'])
       for producto in options_productos:
             df_producto = df[df.family == producto]
             df_producto_year_month_day = df_producto.groupby(["year","month","day"])["sales"].sum().to_frame().reset_index()
@@ -54,8 +68,15 @@ def graph_daily(responses,df):
             ax.plot(days,sales,label = producto)
             for day,sale in zip(days,sales):
                ax.scatter(day,sale,c="blue")
-            ax.set_xticks(ticks=days)   
+            ax.set_xticks(ticks=days)
+            df_producto_day["producto"] = producto
+            df_toexcel = pd.concat([df_toexcel, df_producto_day])
+      df_toexcel = df_toexcel[['producto','day','sales']]
+      df_toexcel = df_toexcel.sort_values(['producto','day'])
+      df_toexcel["day"] = df_toexcel["day"].replace(dict_dias)
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","day":"dia"}),"resultados_por_dia_producto.xlsx")                
    else:
+      df_toexcel = pd.DataFrame(columns = ['day','sales','tienda','producto'])
       for tienda_producto in options_tiendas_productos:
             tienda,producto = tienda_producto
             nb_tienda = int(tienda.split(" ")[1])
@@ -67,7 +88,14 @@ def graph_daily(responses,df):
             ax.plot(days,sales,label = tienda_producto)
             for day,sale in zip(days,sales):
                ax.scatter(day,sale,c="blue")
-            ax.set_xticks(ticks=days)   
+            ax.set_xticks(ticks=days)
+            df_tienda_producto_day["tienda"] = tienda
+            df_tienda_producto_day["producto"] = producto
+            df_toexcel = pd.concat([df_toexcel,df_tienda_producto_day])
+      df_toexcel = df_toexcel[['tienda','producto','day','sales']]
+      df_toexcel = df_toexcel.sort_values(['tienda','producto','day'])
+      df_toexcel["day"] = df_toexcel["day"].replace(dict_dias)
+      downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","day":"dia"}),"resultados_por_dia_tienda_producto.xlsx")                  
    ax.legend()
    ax.grid()
    st.pyplot(fig)    
