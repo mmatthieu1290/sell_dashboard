@@ -37,8 +37,6 @@ def graph_daily(responses,df):
       df_day = df_day_month_year.groupby("day")["sales"].mean().to_frame().reset_index().sort_values("day")
       days = df_day.day.tolist()
       sales = df_day.sales.tolist() 
-      ax.plot(days,sales)
-      ax.set_xticks(ticks=days)
       fig.add_trace(go.Scatter(x=days,y=sales,mode = "lines+markers",marker=dict(size=8)))
       df_day["day"] = df_day["day"].replace(dict_dias)
       downloadExcel(df_day.rename(columns = {"sales":"ventas","day":"dia"}),"resultados_por_dia.xlsx")    
