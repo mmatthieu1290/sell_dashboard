@@ -56,12 +56,13 @@ def graph_years(responses,df):
    elif por_tiendas == False:
       df_toexcel = pd.DataFrame(columns = ['year','sales','producto'])
       fig = go.Figure()
+      print(options_productos)
       for producto in options_productos:
             df_producto = df[df.family == producto]
             df_producto_year = df_producto.groupby("year")["sales"].sum().to_frame().reset_index().sort_values("year")
             sales = df_producto_year.sales.tolist()            
-            df_producto["producto"] = producto
-            df_toexcel = pd.concat([df_toexcel,df_producto])
+            df_producto_year["producto"] = producto
+            df_toexcel = pd.concat([df_toexcel,df_producto_year])
             fig.add_trace(go.Scatter(x=years,y=sales,name=str(producto),mode = "lines+markers",marker=dict(size=8)))
       df_toexcel = df_toexcel[['producto','year','sales']].sort_values(["producto","year"])
       downloadExcel(df_toexcel.rename(columns = {"sales":"ventas","year":"año"}),"resultados_por_año_producto.xlsx")       
